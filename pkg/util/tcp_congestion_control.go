@@ -1,4 +1,4 @@
-// Copyright (C) 2023  mieru authors
+// Copyright (C) 2024  mieru authors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,15 +16,22 @@
 package util
 
 import (
-	"testing"
-	"time"
+	"os"
+	"runtime"
+	"strings"
 )
 
-func TestIsZeroTime(t *testing.T) {
-	if IsZeroTime(time.Now()) {
-		t.Errorf("IsZeroTime(time.Now()) = true, want false")
-	}
-	if !IsZeroTime(ZeroTime()) {
-		t.Errorf("IsZeroTime(ZeroTime()) = false, want true")
+// TCPCongestionControlAlgorithm returns the TCP congestion control algorithm
+// used by the operating system.
+func TCPCongestionControlAlgorithm() string {
+	if runtime.GOOS == "linux" {
+		v, err := os.ReadFile("/proc/sys/net/ipv4/tcp_congestion_control")
+		if err != nil {
+			return ""
+		}
+		return strings.TrimSpace(string(v))
+	} else {
+		// Unsupported platform.
+		return ""
 	}
 }
